@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: prestashop-mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: prestashop
+      MYSQL_DATABASE: prestashop
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - prestashop_network
+
+  prestashop:
+    image: prestashop/prestashop:8.2.1
+    container_name: prestashop-app
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8080:80"
+    environment:
+      DB_SERVER: prestashop-mysql
+      DB_NAME: prestashop
+      DB_USER: root
+      DB_PASSWD: prestashop
+      PS_DOMAIN: localhost:8080
+      PS_INSTALL_AUTO: 1
+      PS_DEV_MODE: 1
+      ADMIN_MAIL: admin@example.com
+      ADMIN_PASSWD: PrestaAdmin123!
+    volumes:
+      - prestashop_data:/var/www/html
+      - ./theme-local:/var/www/html/themes/AngarTheme
+    networks:
+      - prestashop_network
+
+volumes:
+  mysql_data:
+  prestashop_data:
+
+networks:
+  prestashop_network:
+  
+# version: '3.8'
+
+# services:
+#   mysql:
+#     image: mysql:8.0
+#     container_name: prestashop-mysql
+#     restart: unless-stopped
+#     command: --default-authentication-plugin=mysql_native_password
+#     environment:
+#       MYSQL_ROOT_PASSWORD: prestashop
+#       MYSQL_DATABASE: prestashop
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#     networks:
+#       - prestashop_network
+
+#   prestashop:
+#     image: prestashop/prestashop:8.2.1
+#     container_name: prestashop-app
+#     restart: unless-stopped
+#     depends_on:
+#       - mysql
+#     ports:
+#       - "8080:80"
+#     environment:
+#       DB_SERVER: prestashop-mysql
+#       DB_NAME: prestashop
+#       DB_USER: root
+#       DB_PASSWD: prestashop
+#       PS_DOMAIN: localhost:8080
+#       PS_INSTALL_AUTO: 1
+#       PS_DEV_MODE: 1
+#       ADMIN_MAIL: admin@example.com
+#       ADMIN_PASSWD: PrestaAdmin123!
+#     volumes:
+#       - prestashop_data:/var/www/html
+#     networks:
+#       - prestashop_network
+
+# volumes:
+#   mysql_data:
+#   prestashop_data:
+
+# networks:
+#   prestashop_network:

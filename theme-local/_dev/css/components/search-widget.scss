@@ -1,0 +1,15 @@
+.search-widget {
+  display: inline-block;
+
+}
+.header-top {
+  .search-widget {
+    form {
+      input[type="text"] {
+        min-width: inherit;
+        width: 100%;
+      }
+    }
+  }
+}
+ 

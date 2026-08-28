@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>angarcookieinfo</name>
+    <displayName><![CDATA[AT - Cookie banner]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[This module displays a simple cookie banner with information about cookies in your shop.]]></description>
+    <author><![CDATA[angarthemes]]></author>
+    <tab><![CDATA[front_office_features]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>0</need_instance>
+</module>

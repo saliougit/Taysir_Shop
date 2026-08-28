@@ -1,0 +1,364 @@
+/*** Product comments orginal ***/
+
+div#productcomments {
+margin-bottom: 20px;
+}
+
+/* Icons */
+.product-comment-modal .material-icons[data-icon]:before,
+.product-comment-list-item .material-icons[data-icon]:before,
+.product-comments-additional-info .material-icons[data-icon]:before,
+#product-comments-list-header .material-icons[data-icon]:before,
+#product-comments-list-footer .material-icons[data-icon]:before {
+content: attr(data-icon);
+}
+
+.btn-comment .material-icons,
+.btn-comment-inverse .material-icons {
+font-size: 16px;
+margin-right: 6px;
+}
+
+/*** REVIEWS INFO - Additional product infos ***/
+
+/* Read/view reviews */
+.product-comments-additional-info {
+border-top: 1px solid #d6d4d4;
+padding: 12px 0 0px;
+}
+
+.product-comments-additional-info a i {
+font-size: 16px;
+}
+
+.product-comments-additional-info .comments-note {
+float: left;
+margin-right: 4px;
+margin-bottom: 9px;
+}
+
+.product-comments-additional-info .comments-note span.grade, 
+.product-comments-additional-info .comments-note .star_content.clearfix {
+float: left;
+margin-right: 6px;
+}
+
+.product-comments-additional-info .additional-links {
+float: left;
+}
+
+.product-comments-additional-info .additional-links .link-comment {
+float: left;
+margin-right: 10px;
+margin-bottom: 10px;
+}
+
+
+/*** REVIEWS LIST - Product comments list ***/
+
+/* Reviews - header title */
+#product-comments-list-header {
+display: flex;
+flex-direction: row;
+flex-wrap: nowrap;
+justify-content: space-between;
+}
+
+#product-comments-list-header {
+clear: both;
+text-transform: uppercase;
+font-weight: 600;
+font-size: 16px;
+line-height: 30px;
+padding: 0;
+margin-bottom: 20px;
+border-bottom: 1px solid #d6d4d4;
+}
+
+#product-comments-list-header .comments-nb {
+display: inline-block;
+border-bottom: 2px solid #1b82d6;
+margin-bottom: -1px;
+}
+
+#product-comments-list-header .comments-nb .material-icons {
+margin-right: 3px;
+}
+
+#product-comments-list-header .comments-note {
+text-transform: initial;
+font-weight: normal;
+font-size: 13px;
+}
+
+/* Reviews - header grade */
+#product-comments-list-header .comments-note span.grade {
+float: left;
+margin-right: 8px;
+}
+
+#product-comments-list-header .star_content.clearfix {
+float: right;
+}
+
+/* Reviews body */
+.product-comment-list-item {
+padding: 0 0 20px;
+margin: 0 0 20px;
+border-bottom: 1px solid #d6d4d4;
+}
+
+/* Reviews body - left column - col-md-3 */
+.product-comment-list-item .comment-infos .grade-stars {
+display: inline-block;
+position: relative;
+height: 20px;
+margin-bottom: 0px;
+min-width: 120px;
+}
+
+.product-comment-list-item .grade-stars .star-content {
+position: absolute;
+top: 0;
+left: 0;
+}
+
+.product-comment-list-item .comment-infos .comment-date {
+margin-top: 2px;
+margin-bottom: 8px;
+}
+
+.product-comment-list-item .comment-infos .comment-author {
+font-weight: bold;
+}
+
+/* Reviews body - right column - col-md-9 */
+
+/* Review content title */
+.product-comment-list-item .comment-content p.h4 {
+font-size: 14px;
+margin: 1px 0 10px;
+}
+
+.product-comment-list-item .comment-content p {
+margin: 0 0 8px;
+}
+
+/* Up/down buttons */
+.product-comment-list-item .comment-content .comment-buttons a {
+color: #8e8e8e;
+margin-right: 8px;
+}
+
+.product-comment-list-item .comment-content .comment-buttons a .material-icons {
+font-size: 14px;
+cursor: pointer;
+}
+
+/* Button comments */
+#product-comments-list-footer .btn-comment {
+margin: 0 auto;
+display: block;
+}
+
+/* Reviews body - empty */
+#empty-product-comment {
+text-align: center;
+border-bottom: 0;
+padding: 0;
+margin: 0;
+}
+
+
+/* Product comments - hook fix */
+.col-md-6.product_right .product-information .product-comments-additional-info,
+.tabs .product-comments-additional-info {
+display: none;
+}
+
+.col-md-6.product_right .comment_nav,
+div#tab-content .comment_nav {
+display: none;
+}
+
+
+/*** PAGINATION ***/
+@media (min-width: 680px) {
+div#product-comments-list-footer {
+position: relative;
+}
+
+div#product-comments-list-pagination {
+position: absolute;
+right: 0;
+top: 0;
+}
+}
+
+#product-comments-list-pagination ul {
+text-align: center;
+}
+
+#product-comments-list-pagination ul li {
+display: inline-block;
+}
+
+#product-comments-list-pagination ul li span {
+height: 32px;
+width: 24px;
+cursor: pointer;
+display: block;
+text-align: center;
+font-size: 14px;
+line-height: 32px;
+}
+
+#product-comments-list-pagination ul li.active span,
+#product-comments-list-pagination ul li span.next i,
+#product-comments-list-pagination ul li span.prev i {
+font-weight: bold;
+}
+
+#product-comments-list-pagination ul li.disabled span {
+opacity: 0.3;
+cursor: not-allowed;
+}
+
+#product-comments-list-pagination ul li.active span {
+cursor: not-allowed;
+}
+
+#product-comments-list-pagination ul li.hidden {
+display: none;
+}
+
+
+/*** POPUP - Post comment modal ***/
+
+/* Header title */
+.product-comment-modal .modal-header {
+padding: 15px 15px;
+}
+
+.product-comment-modal .modal-header .close {
+position: absolute;
+margin-top: 0px;
+top: 10px;
+right: 10px;
+font-size: 28px;
+}
+
+/* Content */
+.product-comment-modal .modal-body {
+padding: 15px 15px;
+}
+
+.product-comment-modal .modal-header .h2 {
+float: left;
+font-size: 16px;
+margin-bottom: 0;
+}
+
+.product-comment-modal .modal-dialog {
+width: calc(100% - 30px);
+max-width: 680px;
+}
+
+/* Image - left column */
+.product-comment-modal .modal-body .product-cover {
+border: 0;
+margin-bottom: 10px;
+}
+
+.product-comment-modal .modal-dialog .h3 {
+font-size: 14px;
+}
+
+/* Fields - right column */
+.product-comment-modal label.form-label {
+font-weight: bold;
+margin: 12px 0 6px;
+}
+
+.product-comment-modal input {
+width: 100%;
+height: 34px;
+border: 1px solid rgba(0,0,0,.25);
+padding: 0 10px;
+}
+
+.product-comment-modal textarea {
+width: 100%;
+min-height: 80px;
+border: 1px solid rgba(0,0,0,.25);
+margin-bottom: 10px;
+padding: 10px 10px;
+}
+
+.product-comment-modal .required {
+margin: 8px 0;
+}
+
+.product-comment-modal sup {
+color: red;
+}
+
+.product-comment-modal .post-comment-buttons {
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+}
+
+.product-comment-modal .post-comment-buttons .btn-comment {
+margin-left: 15px;
+}
+
+#product-comment-posted-modal .post-comment-buttons,
+#product-comment-post-error .post-comment-buttons,
+#update-comment-usefulness-post-error .post-comment-buttons {
+margin-top: 30px;
+}
+
+.modal-header .material-icons {
+color: #40a85f;
+font-size: 26px;
+line-height: 26px;
+}
+
+.modal-header .material-icons.error {
+color: #a94442;
+}
+
+.modal-header .material-icons.feedback {
+color: #f39d72;
+}
+
+/* Popup rating */
+#post-product-comment-modal ul#criterions_list {
+border-bottom: 1px solid #cdcdcd;
+padding-top: 5px;
+padding-bottom: 5px;
+margin-bottom: 0px;
+list-style-type: none;
+}
+
+#post-product-comment-modal .criterion-rating label {
+float: left;
+margin-right: 4px;
+font-weight: bold;
+}
+
+#post-product-comment-modal .criterion-rating .grade-stars.star_content {
+float: left;
+}
+
+#post-product-comment-form input.error,
+#post-product-comment-form textarea.error {
+background-color: #f2dede;
+border: solid 1px #ebcccc;
+}
+
+#post-product-comment-form input.valid,
+#post-product-comment-form textarea.valid {
+border: solid 1px #d0e9c6;
+}
