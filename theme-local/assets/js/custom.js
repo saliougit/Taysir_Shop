@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	var threshold = header.offsetHeight;
 	var ticking = false;
 
+	// Hauteur du header (etat normal, non "stuck") posee en variable CSS :
+	// le carrousel s'en sert pour remplir exactement l'ecran sous le header,
+	// sans avoir besoin de voir le texte "Bienvenue" en dessous sans scroller.
+	document.documentElement.style.setProperty('--angar-header-h', threshold + 'px');
+
 	function applyState() {
 		if (window.scrollY > threshold) {
 			if (!header.classList.contains('angar-stuck')) {

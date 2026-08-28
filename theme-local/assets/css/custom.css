@@ -377,9 +377,13 @@ div#search_widget form button[type=submit] {
   margin-left: -50vw;
   margin-right: -50vw;
   width: 100vw;
-  height: 60vh;
-  min-height: 320px;
-  max-height: 460px;
+  /* Remplit tout l'ecran sous le header (pas besoin de voir le texte
+     "Bienvenue" en dessous sans scroller) : --angar-header-h est mesuree et
+     posee par assets/js/custom.js, avec un repli raisonnable si le JS n'a
+     pas encore tourne. */
+  height: calc(100vh - var(--angar-header-h, 150px));
+  min-height: 360px;
+  max-height: 760px;
   overflow: hidden;
   background: var(--angar-bg-light);
 }
@@ -815,6 +819,16 @@ a.product-flags-plist span.product-flag.discount-percentage {
   width: 100%;
   padding-top: 10px;
 }
+/* Les bordures de chaque carte (ajoutees via le configurateur "cards
+   rounded") se touchent entre cartes adjacentes et s'annulent visuellement,
+   mais restent visibles sur les bords exterieurs de la rangee, formant un
+   cadre indesirable a gauche/droite. On retire la bordure et on garde
+   seulement l'ombre douce pour l'effet carte. */
+#home_cat_product .bx_box ul[id^="bxslider_"] > li {
+  border: 0 !important;
+  padding: 16px;
+  border-radius: 12px;
+}
 @media (max-width: 991px) {
   #home_cat_product .bx_box ul[id^="bxslider_"] > li {
     width: calc(50% - 10px) !important;
@@ -854,5 +868,84 @@ a.product-flags-plist span.product-flag.discount-percentage {
 /* Fond general blanc */
 body, #wrapper, #content-wrapper, .page-home, #index {
   background: #fff;
+}
+
+/* Hide redundant hr.separator near the home category product block
+   This prevents a double horizontal line when the design already
+   uses ::before/::after pseudo-elements for the "pill + lines".
+   Scoped to avoid affecting separators elsewhere. */
+/* No-op placeholder to keep patch format consistent before adding new rules */
+#home_cat_product + hr.separator,
+#home_cat_product hr.separator {
+  display: none !important;
+}
+
+/* (pseudo-elements for .catprod_title are defined earlier; keep them enabled
+  so the pill stays centered with horizontal lines on each side) */
+
+/* Strong scoped override: remove any background-pattern/border/line that may
+   come from textures/patterns or global hr rules affecting the home block.
+   Keeps the .catprod_title pseudo-elements intact for the pill + side lines. */
+.page-home #home_cat_product,
+.page-home #home_cat_product *,
+#home_cat_product,
+#home_cat_product * {
+  background-image: none !important;
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Ensure any adjacent <hr class="separator"> is hidden (extra safety) */
+.page-home #home_cat_product + hr.separator,
+.page-home #home_cat_product hr.separator,
+#home_cat_product + hr.separator,
+#home_cat_product hr.separator {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+/* Remove large outer frame around the home category product block
+   and present each product as a card with its own border/shadow. */
+.page-home #home_cat_product {
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* Card style for each product item inside the grid.
+   Use box-sizing so borders/padding don't break the flex widths. */
+#home_cat_product .bx_box ul[id^="bxslider_"] > li {
+  box-sizing: border-box !important;
+  background: #fff !important;
+  border: 1px solid var(--angar-border) !important;
+  border-radius: 12px !important;
+  padding: 18px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05) !important;
+  overflow: hidden !important;
+}
+
+/* Slight spacing adjustment for image area inside the card */
+#home_cat_product .bx_box ul[id^="bxslider_"] > li .left-block img {
+  border-radius: 8px !important;
+}
+
+/* Keep the product content stacked neatly inside the card */
+#home_cat_product .bx_box ul[id^="bxslider_"] > li .product_container {
+  padding: 6px 0 0 0 !important;
+}
+
+/* Remove any leftover page-level frame: side borders and wrapper shadow.
+   This neutralizes the large left/right lines while keeping product cards. */
+.page-home #wrapper,
+.page-home main,
+.page-home .container,
+#content-wrapper,
+#wrapper {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  box-shadow: none !important;
 }
 
