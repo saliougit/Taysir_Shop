@@ -33,6 +33,18 @@ color: #000;
 a { color: var(--angar-primary); }
 a:hover { color: var(--angar-secondary); }
 
+/* Le carrousel "sort" du conteneur via width:100vw (voir plus bas) : sur
+   certains navigateurs, 100vw inclut la largeur de la barre de defilement
+   verticale, ce qui cree quelques pixels de debordement horizontal et
+   permet de scroller la page vers la droite.
+   Applique sur <main> plutot que html/body : mettre overflow-x sur body
+   declenche une regle CSS du spec ou overflow-y "visible" devient "auto",
+   ce qui, combine a une hauteur fixe heritee ailleurs dans le theme,
+   bloquait completement le defilement vertical de la page. */
+main {
+  overflow-x: hidden;
+}
+
 /* Focus clavier/clic : remplace le contour noir par defaut du navigateur
    par un liseret sur la palette, plus doux sur nos fonds colores/sombres */
 a:focus-visible,
@@ -920,7 +932,7 @@ body, #wrapper, #content-wrapper, .page-home, #index {
 #home_cat_product .bx_box ul[id^="bxslider_"] > li {
   box-sizing: border-box !important;
   background: #fff !important;
-  border: 1px solid var(--angar-border) !important;
+  border: 0 !important;
   border-radius: 12px !important;
   padding: 18px !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.05) !important;
