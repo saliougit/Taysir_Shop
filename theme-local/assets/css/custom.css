@@ -199,7 +199,7 @@ body.stickymenu_yes.sticky_menu {
   left: 0;
   right: 0;
   z-index: 999;
-  animation: angarSlideDown 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: angarSlideDown 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #header.angar-stuck .header-banner,
 #header.angar-stuck nav.header-nav {
@@ -212,8 +212,8 @@ body.stickymenu_yes.sticky_menu {
   box-shadow: 0 2px 16px rgba(91, 70, 54, 0.12);
 }
 @keyframes angarSlideDown {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
+  from { transform: translateY(-100%); opacity: 0.4; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* Recherche : champ arrondi type barre moderne, plus large.
@@ -377,7 +377,9 @@ div#search_widget form button[type=submit] {
   margin-left: -50vw;
   margin-right: -50vw;
   width: 100vw;
-  height: 560px;
+  height: 60vh;
+  min-height: 320px;
+  max-height: 460px;
   overflow: hidden;
   background: var(--angar-bg-light);
 }
@@ -720,7 +722,7 @@ a.product-flags-plist span.product-flag.discount-percentage {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1.5px solid var(--angar-border);
+  border: 1.5px solid var(--angar-border) !important;
   border-radius: 999px;
   padding: 10px 22px;
   white-space: nowrap;
@@ -730,6 +732,9 @@ a.product-flags-plist span.product-flag.discount-percentage {
   text-transform: uppercase;
   color: var(--angar-primary);
   text-decoration: none !important;
+}
+#home_cat_product .catprod_title a span {
+  border-bottom: 0 !important;
 }
 #home_cat_product .catprod_title a::before {
   content: "";
