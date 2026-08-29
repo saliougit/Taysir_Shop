@@ -56,12 +56,12 @@
             {if $page.page_name == 'index'}
               <h1>
                 <a href="{$urls.base_url}">
-                  <img class="logo img-responsive" src="{if !$shop.logo|strstr:"/"}{$urls.img_ps_url}{/if}{$shop.logo}" alt="{$shop.name}">
+                  <img class="logo img-responsive" src="{$urls.base_url}images/taysir_logo_header-preview.png" alt="{$shop.name}">
                 </a>
               </h1>
             {else}
                 <a href="{$urls.base_url}">
-                  <img class="logo img-responsive" src="{if !$shop.logo|strstr:"/"}{$urls.img_ps_url}{/if}{$shop.logo}" alt="{$shop.name}">
+                  <img class="logo img-responsive" src="{$urls.base_url}images/taysir_logo_header-preview.png" alt="{$shop.name}">
                 </a>
             {/if}
         </div>

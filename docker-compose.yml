@@ -35,6 +35,7 @@ services:
     volumes:
       - prestashop_data:/var/www/html
       - ./theme-local:/var/www/html/themes/AngarTheme
+      - ./images:/var/www/html/images
     networks:
       - prestashop_network
 

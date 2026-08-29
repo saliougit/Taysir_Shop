@@ -691,6 +691,96 @@ a.product-flags-plist span.product-flag.discount-percentage {
   background: rgba(255,255,255,0.3);
 }
 
+.angar-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 38px 0 24px;
+  text-align: center;
+}
+
+.angar-footer-brand-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.angar-footer-brand-logo {
+  max-height: 72px;
+  width: auto;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12));
+  animation: footerLogoFloat 5.5s ease-in-out infinite;
+}
+
+.angar-footer-brand-text {
+  max-width: 640px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.footer-container .row > [class*="col-"] {
+  animation: footerFadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.footer-container .row > [class*="col-"]:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.footer-container .row > [class*="col-"]:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.footer-container .bottom-footer {
+  animation: footerFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.18s;
+}
+
+@keyframes footerLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes footerFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.footer-container li a,
+.angar-footer-social a,
+.angar-footer-brand-link {
+  transition: transform 0.25s ease, color 0.25s ease, background-color 0.25s ease, opacity 0.25s ease;
+}
+
+.footer-container li a:hover,
+.angar-footer-social a:hover,
+.angar-footer-brand-link:hover {
+  transform: translateY(-2px);
+}
+
+.page-home #home_cat_product .bx_box ul[id^="bxslider_"] > li {
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.page-home #home_cat_product .bx_box ul[id^="bxslider_"] > li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.09) !important;
+  border-color: rgba(214, 212, 212, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .angar-footer-brand-logo,
+  .footer-container .row > [class*="col-"],
+  .footer-container .bottom-footer,
+  .page-home #home_cat_product .bx_box ul[id^="bxslider_"] > li {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* Icone WhatsApp flottante : le glyphe FontAwesome fourni par le module rend mal,
    on le remplace par notre propre pictogramme (trace nette, sans dependance de police) */
 #whatsapp-chat-footer a:before {

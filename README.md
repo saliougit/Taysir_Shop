@@ -66,108 +66,142 @@ Ne pas déployer tant que ces points ne sont pas réglés :
 
 ---
 
-## 3. Choisir l'offre chez Hostinger
+## 3. Offre retenue chez Hostinger : VPS KVM 2 (Docker)
 
-PrestaShop 8 a besoin de :
+Plutôt que de migrer vers un hébergement mutualisé classique (PHP/MySQL sans
+Docker), le choix retenu est un **VPS** chez Hostinger : accès root complet,
+donc on peut faire tourner **exactement le même `docker-compose.yml`** qu'en
+local. C'est le déploiement le plus simple et le plus fidèle à ce qui a été
+testé jusqu'ici — pas de migration vers une structure de fichiers différente.
 
-- PHP 8.1 ou 8.2
-- MySQL 5.7+/8.0 ou MariaDB équivalent
-- Au moins 256 Mo de mémoire PHP (512 Mo+ recommandé)
-- Accès SSH pratique mais non obligatoire (FTP + gestionnaire de fichiers
-  suffisent)
+### Comparatif des plans (pack 12 mois, prix promo Hostinger)
 
-Chez **Hostinger**, deux familles de plans conviennent :
+| | KVM 1 | **KVM 2 (retenu)** |
+|---|---|---|
+| Prix promo / mois | 5,99 € | 8,49 € |
+| Prix pack 12 mois | 71,88 € | 101,88 € |
+| ≈ FCFA (~656 F/€) | ~47 150 F | **~66 830 F** |
+| vCPU | 1 | 2 |
+| RAM | 4 Go | 8 Go |
+| NVMe | 50 Go | 100 Go |
+| Bande passante | 4 To | 8 To |
+| Renouvellement (an 2) | 12,99 €/mois → ~102 300 F/an | 16,99 €/mois → ~133 750 F/an |
 
-- **Hébergement Web "Business" ou "Cloud Startup"** : le plus simple, PHP/MySQL
-  géré automatiquement, SSL gratuit inclus, suffisant pour démarrer une
-  boutique de cette taille.
-- **Hébergement Cloud / VPS** : si vous prévoyez beaucoup de trafic ou voulez
-  plus de contrôle (accès root, possibilité de faire tourner Docker si vous
-  préférez répliquer l'environnement actuel tel quel).
+Pour ~19 700 F CFA de plus sur la première année, le KVM 2 double le CPU et
+la RAM — nécessaire pour PrestaShop + MySQL + un reverse proxy tournant en
+containers sur la même machine. **KVM 2 retenu.**
 
-Pour démarrer, l'hébergement **Business** (mutualisé) est largement
-suffisant et le plus simple à administrer.
+⚠️ Les montants FCFA sont des estimations (taux ~656 F/€) ; le montant réel
+débité dépend du taux du jour et d'éventuels frais/taxes de la carte utilisée.
+
+### Nom de domaine
+
+`taysirshop.shop` — 0,99 € (~650 F CFA) la 1ʳᵉ année chez Hostinger (prix
+normal affiché 32,99 €/an). **Avant d'acheter**, vérifier la ligne
+« Renouvellement » dans le panier Hostinger pour connaître le tarif réel de
+l'année 2 (le 32,99 € affiché à côté du prix promo n'est pas forcément ce
+tarif de renouvellement).
+
+### Budget infrastructure (année 1)
+
+| Poste | Coût |
+|---|---|
+| VPS KVM 2 — 12 mois | ~66 830 F CFA |
+| Domaine `taysirshop.shop` — 1ʳᵉ année | ~650 F CFA |
+| SSL Let's Encrypt (via certbot, voir [PRODUCTION_STACK.md](PRODUCTION_STACK.md)) | 0 F |
+| **Total infrastructure** | **~67 480 F CFA** |
+
+### Repère de facturation client
+
+Si le forfait facturé au client pour la mise en production est de
+**200 000 F CFA** (incluant 1 an de VPS + 1 an de domaine) :
+
+```
+200 000 F − 67 480 F (infra) = ~132 520 F CFA de marge / rémunération
+```
+
+À ajuster selon ce qui est réellement convenu avec le client (ce chiffre
+n'est qu'un repère de calcul, pas une recommandation tarifaire figée).
 
 ---
 
-## 4. Déploiement pas à pas
+## 4. Déploiement pas à pas (VPS Docker)
 
-### 4.1 Exporter la base de données locale
+Contrairement à un hébergement mutualisé classique, il n'y a pas de FTP ni
+de `parameters.php` à éditer à la main : on reproduit l'environnement Docker
+local sur le VPS, avec un reverse proxy devant pour le HTTPS.
 
-```bash
-docker exec prestashop-mysql mysqldump -u root -pprestashop prestashop > taysirshop_export.sql
-```
+### 4.1 Préparer le VPS
 
-### 4.2 Préparer les fichiers à transférer
-
-Deux choses à transférer vers l'hébergement :
-
-1. **Le cœur PrestaShop** : tout le contenu du volume `prestashop_data`
-   (dossier `/var/www/html` du conteneur). Pour le récupérer :
+1. Commander le VPS KVM 2 (image de base : Ubuntu 22.04/24.04 recommandé).
+2. Se connecter en SSH (`ssh root@IP_DU_VPS`).
+3. Installer Docker + Docker Compose :
    ```bash
-   docker cp prestashop-app:/var/www/html ./prestashop_export
+   curl -fsSL https://get.docker.com | sh
+   apt-get install -y docker-compose-plugin
    ```
-2. **Le thème personnalisé** : le contenu de [`theme-local/`](theme-local)
-   doit remplacer `themes/AngarTheme/` dans l'export ci-dessus (il est
-   normalement déjà à jour dedans puisqu'il est monté en volume direct).
+4. Pointer le domaine vers l'IP du VPS (chez Hostinger → **Domaines** →
+   DNS → enregistrement `A` vers l'IP du VPS ; ajouter aussi `www`).
 
-### 4.3 Créer la base de données et l'utilisateur chez Hostinger
+### 4.2 Ajouter le reverse proxy + HTTPS (certbot)
 
-Dans hPanel Hostinger → **Bases de données MySQL** : créer une base et un
-utilisateur dédiés (ne pas utiliser `root` en production). Noter le nom
-d'hôte de la base fourni par Hostinger (souvent `localhost` en mutualisé).
+Le détail (Traefik ou Nginx + certbot, config exacte) est dans
+**[PRODUCTION_STACK.md](PRODUCTION_STACK.md)** — c'est ce qui remplace le
+`ports: 8080:80` local par du HTTPS propre sur le domaine réel.
 
-### 4.4 Importer la base
-
-Via **phpMyAdmin** (fourni dans hPanel) ou en ligne de commande si SSH
-disponible :
+### 4.3 Transférer le projet
 
 ```bash
-mysql -u VOTRE_USER -p -h VOTRE_HOTE VOTRE_BASE < taysirshop_export.sql
+# Sur le VPS
+git clone <votre-repo> /opt/taysirshop   # ou scp/rsync depuis le PC local
+cd /opt/taysirshop
 ```
 
-### 4.5 Transférer les fichiers
+Adapter `docker-compose.yml` pour la prod :
+- Remplacer `PS_DOMAIN: localhost:8080` par `PS_DOMAIN: taysirshop.shop`
+- Mots de passe forts pour `MYSQL_ROOT_PASSWORD` et `ADMIN_PASSWD`
+  (jamais ceux utilisés en local)
+- `PS_DEV_MODE: 0` (désactiver le mode debug en production)
+- Retirer l'exposition directe du port 80 si le reverse proxy s'en charge
+  (voir PRODUCTION_STACK.md)
 
-Via le **gestionnaire de fichiers Hostinger** ou FTP/SFTP (identifiants dans
-hPanel → Fichiers → FTP) : uploader le contenu de `prestashop_export/` à la
-racine du domaine (souvent `public_html/`).
+### 4.4 Migrer les données locales (catalogue, thème, images)
 
-### 4.6 Reconfigurer PrestaShop pour le nouvel environnement
+```bash
+# Depuis le PC local : export de la base
+docker exec prestashop-mysql mysqldump -u root -pprestashop prestashop > taysirshop_export.sql
 
-Éditer `app/config/parameters.php` (racine du site) avec les identifiants de
-la base Hostinger (`database_host`, `database_name`, `database_user`,
-`database_password`).
+# Copier vers le VPS
+scp taysirshop_export.sql root@IP_DU_VPS:/opt/taysirshop/
+```
 
-Mettre à jour l'URL de la boutique dans la base — table `ps_shop_url` :
+Sur le VPS, après le premier `docker compose up -d` (qui crée une base
+neuve) :
+```bash
+docker exec -i prestashop-mysql mysql -u root -pVOTRE_NOUVEAU_MDP prestashop < taysirshop_export.sql
+```
 
+Mettre à jour l'URL de la boutique dans la base importée :
 ```sql
-UPDATE ps_shop_url SET domain = 'votredomaine.com', domain_ssl = 'votredomaine.com'
-WHERE id_shop = 1;
+UPDATE ps_shop_url SET domain = 'taysirshop.shop', domain_ssl = 'taysirshop.shop' WHERE id_shop = 1;
+UPDATE ps_configuration SET value = '0' WHERE name IN ('PS_DEV_MODE', 'PS_DISPLAY_ERRORS');
 ```
 
-Désactiver le mode debug (table `ps_configuration`) :
+Le dossier `theme-local/` (thème AngarTheme personnalisé) est versionné
+avec le projet — rien de spécial à migrer séparément s'il part avec le
+`git clone`/`scp` de l'étape 4.3.
 
-```sql
-UPDATE ps_configuration SET value = '0' WHERE name = 'PS_DEV_MODE' OR name = 'PS_DISPLAY_ERRORS';
+### 4.5 Démarrer et vérifier
+
+```bash
+docker compose up -d
+docker exec prestashop-app sh -c "rm -rf /var/www/html/var/cache/*"
 ```
 
-Vider le cache : supprimer le contenu de `var/cache/` sur le serveur (via le
-gestionnaire de fichiers ou SSH).
-
-### 4.7 Permissions fichiers
-
-Certains dossiers doivent rester inscriptibles par PHP : `var/`, `img/`,
-`upload/`, `download/`, `config/`. En mutualisé Hostinger, `755` sur les
-dossiers et `644` sur les fichiers suffit généralement (PHP tourne déjà avec
-les bons droits utilisateur).
-
-### 4.8 Vérifier
-
-- Le front (`https://votredomaine.com/`) charge sans erreur
-- Le back-office (`https://votredomaine.com/adminXXXXXXXXXX/`, garder un nom
-  de dossier admin non devinable) répond et permet la connexion
-- Les images produits et le thème s'affichent correctement
-- Passer une commande test (avant activation réelle du paiement)
+- `https://taysirshop.shop/` charge sans erreur, cadenas SSL présent
+- Back-office accessible (`https://taysirshop.shop/adminXXXXXXXXXX/`)
+- Images produits et thème s'affichent correctement
+- Commande test avant d'activer le paiement réel
 
 ---
 
@@ -214,6 +248,33 @@ On reviendra dessus en détail une fois prêts à le brancher.
   (Améliorer → Mise à jour), toujours après une sauvegarde.
 - **Ajout de produits/catégories** : un guide dédié sera ajouté ici une fois
   le catalogue plus avancé.
+
+---
+
+## 8. Comment le vendeur sait qu'il a une commande
+
+PrestaShop notifie **par email**, pas par SMS/notification push nativement :
+
+- **Email automatique à chaque commande** : envoyé à l'adresse configurée
+  dans Préférences → Boutique (`PS_SHOP_EMAIL`) — c'est le même paramètre
+  que "Email admin" plus haut. Prévoir une vraie adresse email pro plutôt
+  que `admin@example.com` avant le lancement.
+- **Back-office** : la page d'accueil de l'admin (tableau de bord) affiche
+  les commandes récentes et un badge avec le nombre de commandes non
+  traitées. La page **Commandes** liste tout, avec un filtre par statut
+  ("En attente de paiement", "Paiement accepté", etc.).
+- **Le serveur doit pouvoir envoyer des emails** : par défaut PrestaShop
+  utilise la fonction mail() du serveur PHP, souvent peu fiable (fort
+  risque de finir en spam ou de ne jamais partir). Sur le VPS, configurer
+  un envoi SMTP réel dans Préférences → Boutique → Emails (ex. compte SMTP
+  fourni par Hostinger, ou un service comme Brevo/Mailjet qui a un plan
+  gratuit) — sinon les notifications de commande risquent de ne jamais
+  arriver.
+- **Notifications mobiles/WhatsApp** : PrestaShop ne le fait pas nativement.
+  Si le vendeur veut être alerté sur WhatsApp/téléphone, il faudrait un
+  module tiers (ou un petit webhook personnalisé) qui appelle l'API
+  WhatsApp Business à chaque nouvelle commande — pas fait pour l'instant,
+  à évaluer plus tard si le besoin se confirme.
 
 ---
 
