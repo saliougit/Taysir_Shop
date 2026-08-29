@@ -211,7 +211,11 @@ body.stickymenu_yes.sticky_menu {
   left: 0;
   right: 0;
   z-index: 999;
-  animation: angarSlideDown 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+  opacity: 1;
+  animation: angarSlideDown 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 0.55s ease, box-shadow 0.55s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+  will-change: transform, opacity;
 }
 #header.angar-stuck .header-banner,
 #header.angar-stuck nav.header-nav {
@@ -224,7 +228,7 @@ body.stickymenu_yes.sticky_menu {
   box-shadow: 0 2px 16px rgba(91, 70, 54, 0.12);
 }
 @keyframes angarSlideDown {
-  from { transform: translateY(-100%); opacity: 0.4; }
+  from { transform: translateY(-28px); opacity: 0.45; }
   to { transform: translateY(0); opacity: 1; }
 }
 
@@ -932,10 +936,10 @@ body, #wrapper, #content-wrapper, .page-home, #index {
 #home_cat_product .bx_box ul[id^="bxslider_"] > li {
   box-sizing: border-box !important;
   background: #fff !important;
-  border: 0 !important;
+  border: 1px solid rgba(214, 212, 212, 0.8) !important;
   border-radius: 12px !important;
   padding: 18px !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important;
   overflow: hidden !important;
 }
 
@@ -947,6 +951,25 @@ body, #wrapper, #content-wrapper, .page-home, #index {
 /* Keep the product content stacked neatly inside the card */
 #home_cat_product .bx_box ul[id^="bxslider_"] > li .product_container {
   padding: 6px 0 0 0 !important;
+}
+
+/* The module still draws the large side frame on the slider wrapper.
+   Remove it here and let the per-product cards provide the visual box. */
+#home_cat_product .bx_box,
+#home_cat_product .bx-wrapper,
+#home_cat_product .bx-viewport,
+#home_cat_product .bx_box ul {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#home_cat_product .bx_box ul[id^="bxslider_"] {
+  overflow: visible !important;
 }
 
 /* Remove any leftover page-level frame: side borders and wrapper shadow.
