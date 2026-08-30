@@ -68,6 +68,10 @@
                   <div class="angar-carousel-bg" style="background-image: url('{$urls.theme_assets}img/banners/banner6.jpg');"></div>
                   <img src="{$urls.theme_assets}img/banners/banner6.jpg" alt="">
                 </div>
+                <div class="angar-carousel-slide">
+                  <div class="angar-carousel-bg" style="background-image: url('{$urls.theme_assets}img/banners/banner7.png');"></div>
+                  <img src="{$urls.theme_assets}img/banners/banner7.png" alt="">
+                </div>
               </div>
               <button type="button" class="angar-carousel-arrow angar-carousel-prev" aria-label="Précédent">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -82,23 +86,24 @@
                 <button type="button" class="angar-carousel-dot" aria-label="Image 4"></button>
                 <button type="button" class="angar-carousel-dot" aria-label="Image 5"></button>
                 <button type="button" class="angar-carousel-dot" aria-label="Image 6"></button>
+                <button type="button" class="angar-carousel-dot" aria-label="Image 7"></button>
               </div>
             </div>
             <div class="angar-hero">
-              <span class="angar-hero-greeting">Bienvenue chez</span>
-              <h1>{$shop.name}</h1>
-              <p>Cosmétiques, habillement et articles de spiritualité mouride</p>
+              <span class="angar-hero-greeting" data-reveal="fade" data-reveal-delay="1">Bienvenue chez</span>
+              <h1 data-reveal="fade" data-reveal-delay="2">{$shop.name}</h1>
+              <p data-reveal="fade" data-reveal-delay="3">Cosmétiques, habillement et articles de spiritualité</p>
             </div>
-            <span class="angar-section-label">Nos Catégories</span>
+            <span class="angar-section-label" data-reveal="fade" data-reveal-delay="1">Nos Catégories</span>
             <div class="angar-departments">
-              <a class="angar-department angar-department--cosmetiques" href="{$link->getCategoryLink(10)}">
+              <a class="angar-department angar-department--cosmetiques" href="{$link->getCategoryLink(10)}" data-reveal="up" data-reveal-delay="1">
                 <span class="angar-department-icon">{include file='_partials/icons/cosmetics.tpl'}</span>Cosmétiques
               </a>
-              <a class="angar-department angar-department--habillement" href="{$link->getCategoryLink(11)}">
+              <a class="angar-department angar-department--habillement" href="{$link->getCategoryLink(11)}" data-reveal="up" data-reveal-delay="2">
                 <span class="angar-department-icon">{include file='_partials/icons/clothing.tpl'}</span>Habillement
               </a>
-              <a class="angar-department angar-department--spiritualite" href="{$link->getCategoryLink(12)}">
-                <span class="angar-department-icon">{include file='_partials/icons/spirituality.tpl'}</span>Spiritualité Mouride
+              <a class="angar-department angar-department--spiritualite" href="{$link->getCategoryLink(12)}" data-reveal="up" data-reveal-delay="3">
+                <span class="angar-department-icon">{include file='_partials/icons/spirituality.tpl'}</span>Spiritualité
               </a>
             </div>
           {/if}

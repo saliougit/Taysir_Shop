@@ -42,7 +42,7 @@
           <img class="angar-footer-brand-logo" src="{$urls.base_url}images/logo_taysir_shop-preview.png" alt="{$shop.name|escape:'html':'UTF-8'}">
         </a>
         <div class="angar-footer-brand-body">
-          <p class="angar-footer-blurb">{$shop.name} — cosmétiques, habillement et articles de spiritualité mouride. Livrés partout où vous êtes.</p>
+          <p class="angar-footer-blurb">{$shop.name} — cosmétiques, habillement et articles de spiritualité. Livrés partout où vous êtes.</p>
           <div class="angar-footer-social">
             <a href="#" aria-label="Facebook">{include file='_partials/icons/facebook.tpl'}</a>
             <a href="#" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>

@@ -709,8 +709,11 @@ a.product-flags-plist span.product-flag.discount-percentage {
 }
 
 .angar-footer-brand-logo {
-  max-height: 56px;
+  max-height: 84px;
   width: auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12));
   animation: footerLogoFloat 5.5s ease-in-out infinite;
 }
@@ -1077,5 +1080,79 @@ body, #wrapper, #content-wrapper, .page-home, #index {
   border-left: 0 !important;
   border-right: 0 !important;
   box-shadow: none !important;
+}
+
+/* ================================
+   Révélations au scroll
+   Les éléments [data-reveal] ou .js-reveal sont masqués (translate/opacité)
+   puis apparaissent quand ils entrent dans le viewport (ajout de .is-visible
+   par assets/js/custom.js). Délais en cascade via [data-reveal-delay].
+   ================================ */
+[data-reveal],
+.js-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s ease, transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+[data-reveal="fade"],
+.js-reveal.js-reveal-fade { transform: none; }
+[data-reveal="left"] { transform: translateX(-28px); }
+[data-reveal="right"] { transform: translateX(28px); }
+[data-reveal="scale"] { transform: scale(0.94); }
+
+[data-reveal].is-visible,
+.js-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+[data-reveal-delay="1"] { transition-delay: 0.08s; }
+[data-reveal-delay="2"] { transition-delay: 0.16s; }
+[data-reveal-delay="3"] { transition-delay: 0.24s; }
+[data-reveal-delay="4"] { transition-delay: 0.32s; }
+
+/* On réarme proprement les éléments révélés pour éviter que la règle
+   précédente (grounding) ne s'applique au hover des cartes déjà animées. */
+[data-reveal].is-visible:hover,
+.js-reveal.is-visible:hover {
+  transform: none;
+}
+
+/* ================================
+   Effet au scroll des articles (cartes produits de l'accueil)
+   Chaque article entre dans le viewport avec un glissement vertical
+   plus marqué, une légère élévation d'opacité et un léger zoom de l'image.
+   Les cartes arrivent en cascade (voir data-reveal-delay posé en JS).
+   ================================ */
+.page-home #home_cat_product ul[id^="bxslider_"] > li.js-reveal {
+  transform: translateY(46px);
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease, box-shadow 0.3s ease;
+}
+.page-home #home_cat_product ul[id^="bxslider_"] > li.js-reveal.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+/* Zoom discret de l'image pendant l'apparition de l'article */
+.page-home #home_cat_product ul[id^="bxslider_"] > li.js-reveal .left-block img {
+  transform: scale(1.06);
+  opacity: 0.55;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease;
+}
+.page-home #home_cat_product ul[id^="bxslider_"] > li.js-reveal.is-visible .left-block img {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Accessibilité : si l'utilisateur réduit les animations, on désactive
+   aussi les reveals (tout reste visible immédiatement). */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  .js-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 

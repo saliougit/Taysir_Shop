@@ -70,4 +70,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		startAuto();
 	}
+
+	// ============================================================
+	// Révélations au scroll (Intersection Observer)
+	// Les éléments porteurs de [data-reveal] (ou ajoutés dynamiquement
+	// via .js-reveal pour les blocs issus de modules) apparaissent en
+	// fondu + léger glissement une fois qu'ils entrent dans le viewport.
+	// Respecte prefers-reduced-motion : dans ce cas tout reste visible.
+	// ============================================================
+	function markModuleReveals() {
+		if (!document.body.classList.contains('page-home')) {
+			return;
+		}
+		// Blocs produits "par sous-catégorie" (module angarcatproduct) : on arme
+		// chaque carte produit, en ne le faisant qu'une fois (tag .js-reveal).
+		document.querySelectorAll('#home_cat_product ul[id^="bxslider_"] > li:not(.js-reveal)')
+			.forEach(function (el, i) {
+				el.classList.add('js-reveal');
+				el.setAttribute('data-reveal-delay', (i % 4) + 1);
+			});
+		document.querySelectorAll('#home_cat_product .catprod_title a:not(.js-reveal)')
+			.forEach(function (el) { el.classList.add('js-reveal'); el.setAttribute('data-reveal-delay', 1); });
+		// Badges de réassurance
+		document.querySelectorAll('.block-reassurance ul li:not(.js-reveal)')
+			.forEach(function (el, i) { el.classList.add('js-reveal'); el.setAttribute('data-reveal-delay', (i % 4) + 1); });
+	}
+
+	function setupReveals() {
+		var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		markModuleReveals();
+		var selectors = [
+			'[data-reveal]',
+			'.js-reveal'
+		];
+		var items = [];
+		selectors.forEach(function (sel) {
+			Array.prototype.push.apply(items, Array.from(document.querySelectorAll(sel)));
+		});
+
+		if (reduced || !('IntersectionObserver' in window)) {
+			items.forEach(function (el) { el.classList.add('is-visible'); });
+			return;
+		}
+
+		var observer = new IntersectionObserver(function (entries, obs) {
+			entries.forEach(function (entry) {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('is-visible');
+					obs.unobserve(entry.target);
+				}
+			});
+		}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+		items.forEach(function (el) { observer.observe(el); });
+	}
+	setupReveals();
 });
