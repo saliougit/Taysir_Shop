@@ -36,21 +36,18 @@
 
   <div class="container">
 
-    <div class="row">
+    <div class="row angar-footer-intro">
       <div class="col-xs-12 angar-footer-brand">
         <a class="angar-footer-brand-link" href="{$urls.base_url}" aria-label="{$shop.name|escape:'html':'UTF-8'}">
           <img class="angar-footer-brand-logo" src="{$urls.base_url}images/logo_taysir_shop-preview.png" alt="{$shop.name|escape:'html':'UTF-8'}">
         </a>
-      </div>
-    </div>
-
-    <div class="row angar-footer-intro">
-      <div class="col-xs-12">
-        <p class="angar-footer-blurb">{$shop.name} — cosmétiques, habillement et articles de spiritualité mouride. Livrés partout où vous êtes.</p>
-        <div class="angar-footer-social">
-          <a href="#" aria-label="Facebook">{include file='_partials/icons/facebook.tpl'}</a>
-          <a href="#" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
-          <a href="#" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
+        <div class="angar-footer-brand-body">
+          <p class="angar-footer-blurb">{$shop.name} — cosmétiques, habillement et articles de spiritualité mouride. Livrés partout où vous êtes.</p>
+          <div class="angar-footer-social">
+            <a href="#" aria-label="Facebook">{include file='_partials/icons/facebook.tpl'}</a>
+            <a href="#" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
+            <a href="#" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(MSYS_NO_PATHCONV=1 docker exec prestashop-app sh -c \"rm -rf /var/www/html/var/cache/*\")"
+    ]
+  }
+}

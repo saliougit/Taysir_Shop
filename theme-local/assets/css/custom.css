@@ -583,15 +583,17 @@ div#search_widget form button[type=submit] {
   background-size: cover;
   background-position: center;
 }
-.angar-department--cosmetiques {
-  background-image: linear-gradient(160deg, rgba(184,32,46,0.85), rgba(143,23,34,0.9)), url('../img/departments/cosmetiques.jpg');
-}
-.angar-department--habillement {
-  background-image: linear-gradient(160deg, rgba(42,42,42,0.85), rgba(15,15,15,0.9)), url('../img/departments/habillement.jpg');
-}
+/* Degrade neutre (pas de teinte couleur) : transparent en haut pour laisser
+   voir la vraie photo, assombri seulement en bas pour la lisibilite du
+   texte blanc qui y est ancre. */
+.angar-department--cosmetiques,
+.angar-department--habillement,
 .angar-department--spiritualite {
-  background-image: linear-gradient(160deg, rgba(74,18,24,0.85), rgba(15,15,15,0.9)), url('../img/departments/spiritualite.jpg');
+  background-image: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 55%, rgba(0,0,0,0.02) 100%), var(--angar-dept-photo);
 }
+.angar-department--cosmetiques { --angar-dept-photo: url('../img/departments/cosmetiques.png'); }
+.angar-department--habillement { --angar-dept-photo: url('../img/departments/habillement.png'); }
+.angar-department--spiritualite { --angar-dept-photo: url('../img/departments/spiritualite.png'); }
 
 /* ================================
    Rangee de reassurance (blockreassurance) - badges arrondis
@@ -691,27 +693,30 @@ a.product-flags-plist span.product-flag.discount-percentage {
   background: rgba(255,255,255,0.3);
 }
 
+/* Logo a gauche, aligne avec le texte (pas centre au-dessus) */
 .angar-footer-brand {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 38px 0 24px;
-  text-align: center;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 18px;
+  text-align: left;
 }
 
 .angar-footer-brand-link {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  flex-shrink: 0;
 }
 
 .angar-footer-brand-logo {
-  max-height: 72px;
+  max-height: 56px;
   width: auto;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12));
   animation: footerLogoFloat 5.5s ease-in-out infinite;
+}
+
+.angar-footer-brand-body {
+  flex: 1 1 auto;
 }
 
 .angar-footer-brand-text {
