@@ -39,9 +39,8 @@
           {hook h='displayNav1'}
         </div>
         <div class="angar-topbar-social">
-          <a href="#" aria-label="Facebook">{include file='_partials/icons/facebook.tpl'}</a>
-          <a href="#" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
-          <a href="#" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
+          <a href="https://www.instagram.com/bajjen2/" target="_blank" rel="noopener" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
+          <a href="https://wa.me/221766563693" target="_blank" rel="noopener" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
         </div>
       </div>
     </div>

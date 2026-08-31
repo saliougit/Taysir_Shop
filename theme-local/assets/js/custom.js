@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
+	// "Contact us" n'a pas de traduction francaise dans le catalogue de PrestaShop
+	// (ni en base ni dans un fichier de theme trouvable) : correctif rapide en JS.
+	document.querySelectorAll('a[id^="link-static-page-contact-"]').forEach(function (el) {
+		if (el.textContent.trim() === 'Contact us') {
+			el.textContent = 'Nous contacter';
+		}
+	});
+
 	var header = document.getElementById('header');
 	if (!header) {
 		return;
@@ -125,4 +133,72 @@ document.addEventListener('DOMContentLoaded', function () {
 		items.forEach(function (el) { observer.observe(el); });
 	}
 	setupReveals();
+
+	// ============================================================
+	// Animation "vol vers le panier" au clic sur "Ajouter au panier" :
+	// une miniature du produit s'envole visuellement jusqu'à l'icône
+	// panier du header, qui reagit ensuite avec un petit rebond + pulse
+	// sur le badge. Purement visuel : n'intercepte pas le clic, l'ajout
+	// AJAX normal de PrestaShop continue de se faire en parallèle.
+	// ============================================================
+	function setupFlyToCart() {
+		var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		var cartIcon = document.querySelector('#header div#_desktop_cart .blockcart .header');
+		if (!cartIcon) {
+			return;
+		}
+
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest('.add-to-cart');
+			if (!btn || btn.disabled) {
+				return;
+			}
+
+			// Petit rebond du panier a chaque ajout, meme sans image trouvee
+			function bumpCart() {
+				cartIcon.classList.remove('angar-cart-bump');
+				// force reflow pour pouvoir relancer l'animation si on clique vite plusieurs fois
+				void cartIcon.offsetWidth;
+				cartIcon.classList.add('angar-cart-bump');
+			}
+
+			if (reduced) {
+				window.setTimeout(bumpCart, 300);
+				return;
+			}
+
+			var card = btn.closest('.product_container, .product-container, .product-miniature, #product, .quickview');
+			var img = card ? card.querySelector('img') : null;
+			var cartRect = cartIcon.getBoundingClientRect();
+
+			if (!img || !cartRect.width) {
+				window.setTimeout(bumpCart, 300);
+				return;
+			}
+
+			var imgRect = img.getBoundingClientRect();
+			var clone = img.cloneNode(true);
+			clone.setAttribute('aria-hidden', 'true');
+			clone.className = 'angar-fly-to-cart';
+			clone.style.left = imgRect.left + 'px';
+			clone.style.top = imgRect.top + 'px';
+			clone.style.width = imgRect.width + 'px';
+			clone.style.height = imgRect.height + 'px';
+			document.body.appendChild(clone);
+
+			var dx = (cartRect.left + cartRect.width / 2) - (imgRect.left + imgRect.width / 2);
+			var dy = (cartRect.top + cartRect.height / 2) - (imgRect.top + imgRect.height / 2);
+
+			window.requestAnimationFrame(function () {
+				clone.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(0.12)';
+				clone.style.opacity = '0.25';
+			});
+
+			window.setTimeout(function () {
+				clone.remove();
+				bumpCart();
+			}, 700);
+		});
+	}
+	setupFlyToCart();
 });

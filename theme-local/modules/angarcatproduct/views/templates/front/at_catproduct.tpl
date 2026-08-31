@@ -97,6 +97,23 @@
 										{hook h='displayProductPriceBlock' product=$product type='weight'}
 									</div>
 								{/if}
+
+								{* AngarTheme : bouton "Ajouter au panier" directement sur la carte,
+								   pas seulement sur la fiche produit. Memes classes/attributs que le
+								   theme par defaut (.add-to-cart, data-button-action) pour que l'ajout
+								   AJAX natif de PrestaShop ET l'animation "vol vers le panier" (custom.js)
+								   fonctionnent sans rien modifier ailleurs. *}
+								{if !$product.customization_required && ($product.allow_oosp || $product.quantity > 0)}
+									<form action="{$urls.pages.cart}" method="post" class="add-to-cart-or-refresh angar-catprod-cart-form">
+										<input type="hidden" name="token" value="{$static_token}">
+										<input type="hidden" name="id_product" value="{$product.id}">
+										<input type="hidden" name="qty" value="1">
+										<button class="btn add-to-cart angar-catprod-cart-btn" data-button-action="add-to-cart" type="submit" title="{l s='Add to cart' d='Shop.Theme.Actions'}">
+											<i class="material-icons shopping-cart"></i>
+											<span>{l s='Add to cart' d='Shop.Theme.Actions'}</span>
+										</button>
+									</form>
+								{/if}
 							</div>
 
 							<div class="clearfix"></div>

@@ -37,18 +37,20 @@
   <div class="container">
 
     <div class="row angar-footer-intro">
-      <div class="col-xs-12 angar-footer-brand">
+      <div class="col-xs-12 col-md-7 angar-footer-brand">
         <a class="angar-footer-brand-link" href="{$urls.base_url}" aria-label="{$shop.name|escape:'html':'UTF-8'}">
           <img class="angar-footer-brand-logo" src="{$urls.base_url}images/logo_taysir_shop-preview.png" alt="{$shop.name|escape:'html':'UTF-8'}">
         </a>
         <div class="angar-footer-brand-body">
           <p class="angar-footer-blurb">{$shop.name} — cosmétiques, habillement et articles de spiritualité. Livrés partout où vous êtes.</p>
           <div class="angar-footer-social">
-            <a href="#" aria-label="Facebook">{include file='_partials/icons/facebook.tpl'}</a>
-            <a href="#" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
-            <a href="#" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
+            <a href="https://www.instagram.com/bajjen2/" target="_blank" rel="noopener" aria-label="Instagram">{include file='_partials/icons/instagram.tpl'}</a>
+            <a href="https://wa.me/221766563693" target="_blank" rel="noopener" aria-label="WhatsApp">{include file='_partials/icons/whatsapp.tpl'}</a>
           </div>
         </div>
+      </div>
+      <div class="col-xs-12 col-md-5 angar-footer-illustration">
+        {include file='_partials/footer-cart-illustration.tpl'}
       </div>
     </div>
 
@@ -70,6 +72,11 @@
       {block name='copyright_link'}
         {l s='%copyright% Copyright %year% %shop_name%. All Rights Reserved.' sprintf=['%shop_name%' => $shop.name|escape:'html':'UTF-8', '%year%' => 'Y'|date, '%copyright%' => '©'] d='Shop.Theme.Mytheme'}
       {/block}
+      <span class="angar-dev-credit">
+        Développé par Saliou Niane
+        <a href="https://github.com/saliougit" target="_blank" rel="noopener" aria-label="GitHub">{include file='_partials/icons/github.tpl'}</a>
+        <a href="https://www.linkedin.com/in/saliou-niane-a0a06523a" target="_blank" rel="noopener" aria-label="LinkedIn">{include file='_partials/icons/linkedin.tpl'}</a>
+      </span>
   </div>
 
 </div>
