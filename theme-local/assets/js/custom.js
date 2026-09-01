@@ -143,14 +143,28 @@ document.addEventListener('DOMContentLoaded', function () {
 	// ============================================================
 	function setupFlyToCart() {
 		var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		var cartIcon = document.querySelector('#header div#_desktop_cart .blockcart .header');
-		if (!cartIcon) {
+		var cartIconSelector = '#header div#_desktop_cart .blockcart .header';
+		if (!document.querySelector(cartIconSelector)) {
 			return;
 		}
 
+		// Ecoute en phase de capture (3e argument = true) : certains gestionnaires
+		// PrestaShop desactivent le bouton "Ajouter au panier" des le clic (anti
+		// double-soumission). En bubble, notre listener s'executait APRES et
+		// voyait donc btn.disabled=true, annulant l'animation. En capture, on
+		// passe en premier, avant que quoi que ce soit d'autre ne desactive le bouton.
 		document.addEventListener('click', function (e) {
 			var btn = e.target.closest('.add-to-cart');
-			if (!btn || btn.disabled) {
+			if (!btn) {
+				return;
+			}
+
+			// Reinterroge le DOM a CHAQUE clic : PrestaShop remplace l'icone panier
+			// (rafraichissement AJAX du mini-panier apres chaque ajout), donc une
+			// reference mise en cache une seule fois au chargement devient orpheline
+			// (detachee du document) des le 2e ajout, et l'animation ne se voit plus.
+			var cartIcon = document.querySelector(cartIconSelector);
+			if (!cartIcon) {
 				return;
 			}
 
@@ -198,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				clone.remove();
 				bumpCart();
 			}, 700);
-		});
+		}, true);
 	}
 	setupFlyToCart();
 });

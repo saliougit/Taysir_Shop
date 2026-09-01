@@ -1,14 +1,22 @@
 # Stack de production — conteneurs à ajouter
 
-Ce document liste les services Docker **à ajouter au `docker-compose.yml`
-actuel** pour passer de l'environnement de développement local (juste
-`prestashop` + `mysql`, exposé sur `localhost:8080`) à une mise en
-production propre sur le VPS (HTTPS réel, nom de domaine, meilleures
-performances). Voir [README.md](README.md) pour le contexte général de
-déploiement (VPS Hostinger KVM 2).
+Les fichiers sont **déjà prêts** dans le projet, pas seulement documentés :
 
-En local, **rien de tout ceci n'est nécessaire** — ce doc ne sert qu'au
-moment du déploiement sur le VPS.
+- [`docker-compose.prod.yml`](docker-compose.prod.yml) — stack complète VPS
+  (mysql + prestashop + nginx + certbot + sauvegarde quotidienne)
+- [`nginx/conf.d/taysirshop.conf`](nginx/conf.d/taysirshop.conf) — actif par
+  défaut (HTTP simple, pour le tout premier lancement)
+- [`nginx/conf.d/taysirshop.conf.full`](nginx/conf.d/taysirshop.conf.full) —
+  la version HTTPS, à activer une fois le certificat obtenu (§1 ci-dessous)
+- [`.env.example`](.env.example) — à copier en `.env` sur le VPS avec les
+  vrais mots de passe/domaine (jamais commité tel quel)
+
+Ce document explique **comment les utiliser**. Voir [README.md](README.md)
+pour le contexte général de déploiement (VPS Hostinger KVM 2).
+
+En local, **rien de tout ceci n'est nécessaire** — le `docker-compose.yml`
+actuel (sans HTTPS, sur `localhost:8080`) suffit pour développer. Cette
+stack "prod" ne sert qu'au moment du déploiement sur le VPS.
 
 ---
 
@@ -24,86 +32,48 @@ production il faut :
 
 ### Option A — nginx + certbot (classique, contrôle total)
 
-Ajouter au `docker-compose.yml` :
+Tous les fichiers existent déjà (`docker-compose.prod.yml`, `nginx/conf.d/`).
+Marche à suivre complète, une seule fois, au tout premier déploiement :
 
-```yaml
-  nginx:
-    image: nginx:stable
-    container_name: taysirshop-nginx
-    restart: unless-stopped
-    depends_on:
-      - prestashop
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./certbot/www:/var/www/certbot:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-    networks:
-      - prestashop_network
-
-  certbot:
-    image: certbot/certbot
-    container_name: taysirshop-certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-    # Genere le certificat la 1ere fois (voir commande plus bas), puis
-    # renouvelle automatiquement tous les 12h (no-op si pas encore l'heure)
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-```
-
-Fichier `nginx/conf.d/taysirshop.conf` (à créer) — redirige le HTTP vers le
-HTTPS et fait le proxy vers le conteneur `prestashop` (port 80 interne, pas
-8080 — retirer/adapter le mapping `ports: 8080:80` du service `prestashop`
-en production puisque c'est nginx qui écoute désormais sur 80/443) :
-
-```nginx
-server {
-    listen 80;
-    server_name taysirshop.shop www.taysirshop.shop;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl;
-    server_name taysirshop.shop www.taysirshop.shop;
-
-    ssl_certificate     /etc/letsencrypt/live/taysirshop.shop/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/taysirshop.shop/privkey.pem;
-
-    client_max_body_size 64M;
-
-    location / {
-        proxy_pass http://prestashop:80;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Génération du tout premier certificat (une fois le DNS du domaine pointé
-vers le VPS, et nginx démarré en HTTP simple pour valider le challenge) :
-
+**0. Préparer `.env`** (sur le VPS, à côté de `docker-compose.prod.yml`) :
 ```bash
-docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
+cp .env.example .env
+nano .env   # renseigner MYSQL_ROOT_PASSWORD, ADMIN_PASSWD, etc.
+```
+
+**1. Pointer le DNS** du domaine (`taysirshop.shop` et `www.taysirshop.shop`)
+vers l'IP du VPS (chez le registrar du domaine, pas sur le VPS).
+
+**2. Démarrer sans HTTPS d'abord** — `nginx/conf.d/taysirshop.conf` est déjà
+la version HTTP simple par défaut, ça marche tel quel :
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env up -d mysql prestashop nginx
+```
+
+**3. Générer le premier certificat** (le DNS doit déjà pointer vers le VPS) :
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env run --rm certbot \
+  certonly --webroot -w /var/www/certbot \
   -d taysirshop.shop -d www.taysirshop.shop \
-  --email VOTRE_EMAIL --agree-tos --no-eff-email
+  --email adamadiou05@gmail.com --agree-tos --no-eff-email
 ```
 
-Puis redémarrer nginx pour qu'il prenne le certificat en compte :
+**4. Basculer vers la config HTTPS** et redémarrer nginx :
 ```bash
-docker compose restart nginx
+cp nginx/conf.d/taysirshop.conf.full nginx/conf.d/taysirshop.conf
+docker compose -f docker-compose.prod.yml --env-file .env restart nginx
 ```
+
+**5. Démarrer le reste de la stack** (certbot pour le renouvellement auto,
+sauvegardes) :
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env up -d
+```
+
+Le site est alors accessible en `https://taysirshop.shop`. Le conteneur
+`certbot` vérifie toutes les 12h si le certificat approche de l'expiration
+(~90 jours) et le renouvelle tout seul — rien à refaire manuellement après
+ce premier lancement.
 
 ### Option B — Traefik (plus simple à maintenir, HTTPS automatique)
 
@@ -125,55 +95,34 @@ taille (quelques dizaines de produits). Utile plus tard si :
 - Le back-office ou le front deviennent lents (cache objet PHP par défaut
   = fichiers, plus lent que Redis en mémoire)
 
-```yaml
-  redis:
-    image: redis:7-alpine
-    container_name: taysirshop-redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    networks:
-      - prestashop_network
-```
+Déjà présent, **commenté**, dans `docker-compose.prod.yml` (service
+`redis` + volume `redis_data`). Le jour où c'est nécessaire : décommenter
+le service et le volume, `docker compose -f docker-compose.prod.yml
+--env-file .env up -d redis`, puis activer côté PrestaShop : back-office →
+Paramètres avancés → Performance → Cache → choisir "Redis", hôte `redis`,
+port `6379`.
 
-Puis activer le cache Redis côté PrestaShop : back-office → Paramètres
-avancés → Performance → Cache → choisir "Redis", hôte `redis`, port `6379`.
-
-**Ne pas ajouter maintenant** — à faire seulement si un ralentissement
+**Ne pas activer maintenant** — à faire seulement si un ralentissement
 réel est constaté après le lancement.
 
 ---
 
 ## 3. Sauvegardes automatiques — recommandé dès le lancement
 
-Un petit service qui exporte la base régulièrement, en plus des
-sauvegardes Hostinger (défense en profondeur) :
+Déjà dans `docker-compose.prod.yml` (service `backup`) : exporte la base
+dans `./backups/` toutes les 24h, conserve 14 jours glissants, supprime les
+plus anciennes automatiquement. Se lance avec le reste de la stack (§1
+étape 5), rien à configurer en plus que le `.env`.
 
-```yaml
-  backup:
-    image: mysql:8.0
-    container_name: taysirshop-backup
-    restart: unless-stopped
-    depends_on:
-      - mysql
-    volumes:
-      - ./backups:/backups
-    entrypoint: >
-      /bin/sh -c '
-      while true; do
-        mysqldump -h mysql -u root -p"$$MYSQL_ROOT_PASSWORD" prestashop | gzip > /backups/prestashop_$$(date +%Y%m%d_%H%M%S).sql.gz;
-        find /backups -name "*.sql.gz" -mtime +14 -delete;
-        sleep 86400;
-      done'
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    networks:
-      - prestashop_network
+Pour restaurer une sauvegarde en cas de besoin :
+```bash
+gunzip < backups/prestashop_AAAAMMJJ_HHMMSS.sql.gz | \
+  docker compose -f docker-compose.prod.yml --env-file .env exec -T mysql \
+  mysql -u root -p"$MYSQL_ROOT_PASSWORD" prestashop
 ```
 
-Sauvegarde quotidienne, conservée 14 jours glissants. Adapter le mot de
-passe (idéalement via un fichier `.env` plutôt qu'en clair dans
-`docker-compose.yml`).
+Ceci s'ajoute aux sauvegardes automatiques Hostinger (défense en
+profondeur) — voir README.md pour l'offre VPS retenue.
 
 ---
 

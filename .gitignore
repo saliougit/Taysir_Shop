@@ -1,0 +1,13 @@
+# Secrets — jamais commités (copier .env.example -> .env sur le VPS)
+.env
+
+# Certificats HTTPS (générés par certbot sur le VPS, propres à chaque machine)
+certbot/conf/
+certbot/www/
+
+# Sauvegardes de base de données (contiennent des données clients réelles
+# une fois en prod — ne doivent pas finir dans l'historique git)
+backups/*.sql.gz
+
+# Node (scripts Playwright ponctuels, jamais utilisés par le site lui-même)
+node_modules/

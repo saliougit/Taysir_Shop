@@ -70,9 +70,13 @@ Ne pas déployer tant que ces points ne sont pas réglés :
 
 Plutôt que de migrer vers un hébergement mutualisé classique (PHP/MySQL sans
 Docker), le choix retenu est un **VPS** chez Hostinger : accès root complet,
-donc on peut faire tourner **exactement le même `docker-compose.yml`** qu'en
-local. C'est le déploiement le plus simple et le plus fidèle à ce qui a été
-testé jusqu'ici — pas de migration vers une structure de fichiers différente.
+donc on fait tourner **le même projet Docker** qu'en local (mêmes images,
+même thème monté en volume), avec un fichier
+[`docker-compose.prod.yml`](docker-compose.prod.yml) dédié à la prod
+(HTTPS, mots de passe via `.env`, pas d'exposition directe du port 8080—
+détail dans [PRODUCTION_STACK.md](PRODUCTION_STACK.md)). C'est le
+déploiement le plus simple et le plus fidèle à ce qui a été testé jusqu'ici
+— pas de migration vers une structure de fichiers différente.
 
 ### Comparatif des plans (pack 12 mois, prix promo Hostinger)
 
@@ -157,13 +161,16 @@ git clone <votre-repo> /opt/taysirshop   # ou scp/rsync depuis le PC local
 cd /opt/taysirshop
 ```
 
-Adapter `docker-compose.yml` pour la prod :
-- Remplacer `PS_DOMAIN: localhost:8080` par `PS_DOMAIN: taysirshop.shop`
-- Mots de passe forts pour `MYSQL_ROOT_PASSWORD` et `ADMIN_PASSWD`
-  (jamais ceux utilisés en local)
-- `PS_DEV_MODE: 0` (désactiver le mode debug en production)
-- Retirer l'exposition directe du port 80 si le reverse proxy s'en charge
-  (voir PRODUCTION_STACK.md)
+C'est `docker-compose.prod.yml` (déjà prêt, pas `docker-compose.yml` qui
+reste le fichier de dev local) qui est utilisé en prod — il lit ses valeurs
+depuis un fichier `.env` à créer sur le VPS :
+```bash
+cp .env.example .env
+nano .env   # PS_DOMAIN=taysirshop.shop, mots de passe forts (jamais ceux du local), etc.
+```
+`PS_DEV_MODE` y est déjà à `0` et le port 8080 n'est pas exposé (nginx
+écoute sur 80/443) — rien d'autre à adapter. Détail pas à pas de la
+génération du certificat HTTPS : [PRODUCTION_STACK.md](PRODUCTION_STACK.md).
 
 ### 4.4 Migrer les données locales (catalogue, thème, images)
 
@@ -175,10 +182,10 @@ docker exec prestashop-mysql mysqldump -u root -pprestashop prestashop > taysirs
 scp taysirshop_export.sql root@IP_DU_VPS:/opt/taysirshop/
 ```
 
-Sur le VPS, après le premier `docker compose up -d` (qui crée une base
-neuve) :
+Sur le VPS, après le premier démarrage de `mysql` (qui crée une base
+neuve — voir §1 étape 2 de PRODUCTION_STACK.md) :
 ```bash
-docker exec -i prestashop-mysql mysql -u root -pVOTRE_NOUVEAU_MDP prestashop < taysirshop_export.sql
+docker exec -i taysirshop-mysql mysql -u root -pVOTRE_NOUVEAU_MDP prestashop < taysirshop_export.sql
 ```
 
 Mettre à jour l'URL de la boutique dans la base importée :
@@ -187,15 +194,19 @@ UPDATE ps_shop_url SET domain = 'taysirshop.shop', domain_ssl = 'taysirshop.shop
 UPDATE ps_configuration SET value = '0' WHERE name IN ('PS_DEV_MODE', 'PS_DISPLAY_ERRORS');
 ```
 
-Le dossier `theme-local/` (thème AngarTheme personnalisé) est versionné
-avec le projet — rien de spécial à migrer séparément s'il part avec le
-`git clone`/`scp` de l'étape 4.3.
+Les dossiers `theme-local/` (thème AngarTheme personnalisé) et `images/`
+(logos, bannières, visuels produits) sont versionnés avec le projet —
+rien de spécial à migrer séparément s'ils partent avec le `git clone`/`scp`
+de l'étape 4.3 : les deux sont montés en volume dans `docker-compose.prod.yml`
+exactement comme en local.
 
 ### 4.5 Démarrer et vérifier
 
+Suivre la marche à suivre complète (ordre des services, certificat HTTPS)
+dans [PRODUCTION_STACK.md §1](PRODUCTION_STACK.md#1-reverse-proxy--https-nginx--certbot).
+Une fois tout démarré :
 ```bash
-docker compose up -d
-docker exec prestashop-app sh -c "rm -rf /var/www/html/var/cache/*"
+docker exec taysirshop-app sh -c "rm -rf /var/www/html/var/cache/*"
 ```
 
 - `https://taysirshop.shop/` charge sans erreur, cadenas SSL présent

@@ -801,7 +801,7 @@ a.product-flags-plist span.product-flag.discount-percentage {
 }
 
 .angar-cw-basket {
-  fill: rgba(255, 255, 255, 0.12);
+  fill: #2c2a28;
   stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 5;
   stroke-linejoin: round;
@@ -831,6 +831,33 @@ a.product-flags-plist span.product-flag.discount-percentage {
   stroke: rgba(255, 255, 255, 0.35);
   stroke-width: 4;
   stroke-linecap: round;
+}
+
+/* Logo Taysir Shop en "autocollant" sur la face du panier */
+.angar-cw-cart-badge-bg {
+  fill: #fff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+.angar-cw-cart-logo {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+/* Le panier est simplement deja plein de produits (plus simple qu'une
+   animation de ramassage). */
+.angar-cw-good {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1.5;
+}
+.angar-cw-good-a { fill: var(--angar-secondary); }
+.angar-cw-good-b { fill: var(--angar-primary); }
+.angar-cw-good-c { fill: #fff; fill-opacity: 0.9; }
+
+.angar-cw-good-ribbon {
+  fill: rgba(255, 255, 255, 0.55);
+}
+.angar-cw-good-c-ribbon {
+  fill: var(--angar-primary);
+  fill-opacity: 0.35;
 }
 
 /* "Balade" d'ensemble : un leger va-et-vient horizontal donne l'impression
@@ -1021,10 +1048,22 @@ a.product-flags-plist span.product-flag.discount-percentage {
    143px de large (reste de l'ancienne colonne etroite) : "Crème Hydratante"
    devenait "Crème Hydratan..." bien avant la fin d'un mot. Les cartes sont
    maintenant bien plus larges : on autorise 2 lignes avant de couper. */
+/* Le theme de base centrait tout le bloc droit de la carte (nom, prix,
+   description). Sur 2 lignes ca donne un nom "en escalier" difficile a
+   lire ; on repasse tout en aligne a gauche, comme une fiche produit
+   normale. */
+#home_cat_product .right-block,
+#home_cat_product .name_block,
+#home_cat_product .product-desc,
+#home_cat_product .product-price-and-shipping {
+  text-align: left !important;
+}
+
 #home_cat_product .name_block a {
   white-space: normal !important;
   width: auto !important;
   overflow: hidden;
+  text-overflow: ellipsis;
   display: -webkit-box !important;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1040,34 +1079,78 @@ a.product-flags-plist span.product-flag.discount-percentage {
 /* Bouton "Ajouter au panier" directement sur les cartes produit de la home
    (avant : uniquement sur la fiche produit). */
 #home_cat_product .angar-catprod-cart-form {
+  /* La classe .add-to-cart-or-refresh (heritee du theme, prevue pour la
+     fiche produit) n'est pas en display:block/100% par defaut : le bouton
+     a width:100% se calait donc sur un parent trop etroit et le texte
+     debordait/etait coupe. On force explicitement la largeur ici. */
+  display: block !important;
+  width: 100% !important;
   margin: 10px 0 2px;
+  /* Cache par defaut, revele au survol de la carte (cf. regle plus bas) :
+     la hauteur reste reservee en permanence, donc aucun saut de mise en
+     page quand le bouton apparait/disparait. Duree/easing alignes sur les
+     autres transitions "douces" du site (meme courbe que les reveals au
+     scroll) pour eviter l'effet de pop brusque. */
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
 }
 
+/* Le survol est ecoute sur la carte entiere (li), pas juste sur
+   product_container : ca evite un flicker si la souris passe sur la marge
+   interne de la carte avant d'atteindre le contenu. */
+#home_cat_product .bx_box ul[id^="bxslider_"] > li:hover .angar-catprod-cart-form,
+#home_cat_product .product_container:focus-within .angar-catprod-cart-form {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Pas de "hover" fiable au toucher (mobile/tablette) : on garde le bouton
+   visible en permanence plutot que de le rendre inaccessible. */
+@media (hover: none) {
+  #home_cat_product .angar-catprod-cart-form {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+/* Style "contour" -> se remplit au survol (comme demande), et box-sizing
+   explicite : sans lui la largeur 100% + le padding depassaient du bouton
+   de quelques pixels, ce qui coupait la fin du texte ("...panie|r" hors cadre). */
 #home_cat_product .angar-catprod-cart-btn {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   width: 100%;
-  border: none;
+  border: 1.5px solid var(--angar-primary);
   border-radius: 999px;
-  background: var(--angar-primary);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 9px 14px;
+  background: transparent;
+  color: var(--angar-primary);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  padding: 8px 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
 }
 
 #home_cat_product .angar-catprod-cart-btn .material-icons {
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 #home_cat_product .angar-catprod-cart-btn:hover {
-  background: var(--angar-primary-dark);
+  background: var(--angar-primary);
+  color: #fff;
   box-shadow: 0 6px 16px rgba(184, 32, 46, 0.28);
 }
 
@@ -1187,17 +1270,18 @@ a.product-flags-plist span.product-flag.discount-percentage {
 #home_cat_product .bx_box ul[id^="bxslider_"] {
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: 20px !important;
+  gap: 16px !important;
   width: 100% !important;
   height: auto !important;
   transform: none !important;
   position: static !important;
 }
+/* Cartes reduites : 5 par ligne au lieu de 4 (elles etaient un peu grosses). */
 #home_cat_product .bx_box ul[id^="bxslider_"] > li {
   float: none !important;
-  width: calc(25% - 15px) !important;
+  width: calc(20% - 13px) !important;
   height: auto !important;
-  min-width: 220px;
+  min-width: 170px;
 }
 #home_cat_product .product_container {
   display: flex !important;
@@ -1219,14 +1303,23 @@ a.product-flags-plist span.product-flag.discount-percentage {
 #home_cat_product .left-block img {
   display: block !important;
   width: 100% !important;
-  aspect-ratio: 1 / 1;
+  /* Carre = cartes trop hautes une fois retrecies (5 par ligne) : format
+     plus court pour des cartes plus compactes. */
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   height: auto !important;
   margin: 0 auto;
   border-radius: 12px !important;
 }
+/* Le CSS du module angarcatproduct (at_catproduct.css) impose lui-meme
+   "#home_cat_product ul li .right-block { float:left; width:60% }", plus
+   specifique que la regle ci-dessous (2 balises en plus dans le selecteur) :
+   elle gagnait la cascade et retrecissait tout le bloc droit (nom/prix/
+   bouton) a 60% de la carte -> c'est ce qui faisait deborder le texte du
+   bouton "Ajouter au panier". !important pour trancher definitivement. */
 #home_cat_product .right-block {
-  width: 100%;
+  float: none !important;
+  width: 100% !important;
   padding-top: 10px;
 }
 /* Les bordures de chaque carte (ajoutees via le configurateur "cards
@@ -1241,7 +1334,12 @@ a.product-flags-plist span.product-flag.discount-percentage {
 }
 @media (max-width: 991px) {
   #home_cat_product .bx_box ul[id^="bxslider_"] > li {
-    width: calc(50% - 10px) !important;
+    width: calc(33.333% - 11px) !important;
+  }
+}
+@media (max-width: 767px) {
+  #home_cat_product .bx_box ul[id^="bxslider_"] > li {
+    width: calc(50% - 8px) !important;
   }
 }
 @media (max-width: 575px) {
@@ -1343,9 +1441,20 @@ body, #wrapper, #content-wrapper, .page-home, #index {
   background: #fff !important;
   border: 1px solid rgba(214, 212, 212, 0.8) !important;
   border-radius: 12px !important;
-  padding: 18px !important;
+  padding: 12px !important;
   box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important;
   overflow: hidden !important;
+}
+
+/* Cartes plus compactes : texte legerement reduit pour rester proportionne. */
+#home_cat_product .name_block a {
+  font-size: 13px !important;
+}
+#home_cat_product .product-price-and-shipping .price {
+  font-size: 15px !important;
+}
+#home_cat_product .product-desc {
+  font-size: 12px !important;
 }
 
 /* Slight spacing adjustment for image area inside the card */

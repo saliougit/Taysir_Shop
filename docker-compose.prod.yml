@@ -1,0 +1,123 @@
+# Stack de PRODUCTION (VPS). Se lance avec :
+#   docker compose -f docker-compose.prod.yml --env-file .env up -d
+#
+# Different du docker-compose.yml local :
+#  - prestashop n'expose plus le port 8080 au public, c'est nginx qui
+#    ecoute sur 80/443 et fait le proxy en interne
+#  - PS_DEV_MODE desactive (perfs, pas d'infos techniques affichees aux
+#    visiteurs en cas d'erreur)
+#  - ajoute nginx + certbot (HTTPS) et un service de sauvegarde quotidienne
+#  - mots de passe/domaine lus depuis .env (voir .env.example), plus rien
+#    en clair ici
+#
+# Voir PRODUCTION_STACK.md pour la marche a suivre complete (1er lancement,
+# generation du certificat, etc.)
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: taysirshop-mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: prestashop
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - prestashop_network
+
+  prestashop:
+    image: prestashop/prestashop:8.2.1
+    container_name: taysirshop-app
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    # Pas de "ports:" ici expres : seul nginx est expose publiquement.
+    # (decommenter temporairement "8080:80" si besoin de debugger en direct)
+    environment:
+      DB_SERVER: taysirshop-mysql
+      DB_NAME: prestashop
+      DB_USER: root
+      DB_PASSWD: ${MYSQL_ROOT_PASSWORD}
+      PS_DOMAIN: ${PS_DOMAIN}
+      PS_INSTALL_AUTO: 1
+      PS_DEV_MODE: 0
+      ADMIN_MAIL: ${ADMIN_MAIL}
+      ADMIN_PASSWD: ${ADMIN_PASSWD}
+    volumes:
+      - prestashop_data:/var/www/html
+      - ./theme-local:/var/www/html/themes/AngarTheme
+      - ./images:/var/www/html/images
+    networks:
+      - prestashop_network
+
+  nginx:
+    image: nginx:stable
+    container_name: taysirshop-nginx
+    restart: unless-stopped
+    depends_on:
+      - prestashop
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    networks:
+      - prestashop_network
+
+  certbot:
+    image: certbot/certbot
+    container_name: taysirshop-certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    # Ne genere PAS le premier certificat (ca se fait a la main, voir
+    # PRODUCTION_STACK.md) — celui-ci se contente de tenter un renouvellement
+    # tous les 12h, ce qui ne fait rien tant que le cert n'est pas encore a
+    # moins de 30 jours de son expiration.
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  backup:
+    image: mysql:8.0
+    container_name: taysirshop-backup
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      /bin/sh -c '
+      while true; do
+        mysqldump -h taysirshop-mysql -u root -p"$$MYSQL_ROOT_PASSWORD" prestashop | gzip > /backups/prestashop_$$(date +%Y%m%d_%H%M%S).sql.gz;
+        find /backups -name "*.sql.gz" -mtime +14 -delete;
+        sleep 86400;
+      done'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - prestashop_network
+
+  # Redis desactive par defaut : PrestaShop tourne tres bien sans pour un
+  # catalogue de cette taille. A activer plus tard seulement si un
+  # ralentissement reel est constate (voir PRODUCTION_STACK.md §2) :
+  #
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: taysirshop-redis
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - prestashop_network
+
+volumes:
+  mysql_data:
+  prestashop_data:
+  # redis_data:
+
+networks:
+  prestashop_network:

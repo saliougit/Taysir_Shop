@@ -37,6 +37,23 @@
       <path class="angar-cw-basket-lines" d="M126 58 L134 110 M218 58 L206 110 M108 58 L120 110"></path>
       <path class="angar-cw-frame" d="M120 110 L112 130 M206 110 L214 130"></path>
 
+      <!-- panier deja rempli de produits "maison" (plus simple qu'une
+           animation de ramassage : le chariot est simplement plein) -->
+      <g class="angar-cw-goods">
+        <rect class="angar-cw-good angar-cw-good-a" x="122" y="44" width="26" height="20" rx="4"></rect>
+        <rect class="angar-cw-good-ribbon angar-cw-good-a-ribbon" x="122" y="52" width="26" height="4"></rect>
+
+        <rect class="angar-cw-good angar-cw-good-b" x="150" y="36" width="24" height="26" rx="4"></rect>
+        <rect class="angar-cw-good-ribbon angar-cw-good-b-ribbon" x="150" y="47" width="24" height="4"></rect>
+
+        <rect class="angar-cw-good angar-cw-good-c" x="177" y="46" width="22" height="18" rx="4"></rect>
+        <rect class="angar-cw-good-ribbon angar-cw-good-c-ribbon" x="177" y="53" width="22" height="4"></rect>
+      </g>
+
+      <!-- plaque logo Taysir Shop au centre du panier -->
+      <circle class="angar-cw-cart-badge-bg" cx="163" cy="85" r="14"></circle>
+      <image class="angar-cw-cart-logo" href="{$urls.base_url}images/taysir_logo_header-preview.png" x="150" y="72" width="26" height="26" preserveAspectRatio="xMidYMid meet"></image>
+
       <g class="angar-cw-wheel angar-cw-wheel-rear">
         <circle cx="112" cy="134" r="11"></circle>
         <circle class="angar-cw-hub" cx="112" cy="134" r="3"></circle>
