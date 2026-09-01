@@ -1,8 +1,9 @@
-# Taysir Shop — PrestaShop (AngarTheme personnalisé)
+# Taysir Shop — PrestaShop
 
 Boutique en ligne PrestaShop 8.2.1 — cosmétiques, habillement et articles de
-spiritualité mouride. Thème `AngarTheme` fortement personnalisé (palette,
-header, menu, carrousel, icônes) pour la marque **Taysir Shop**.
+spiritualité mouride. Le thème personnalisé de la marque **Taysir Shop** a
+été intégré dans le projet local avec une palette, un header, un menu,
+un carrousel et des icônes spécifiques.
 
 Ce document couvre tout ce qu'il faut savoir pour **passer de l'environnement
 de développement local (Docker) à un hébergement en production**, avec
@@ -23,7 +24,7 @@ Défini dans [`docker-compose.yml`](docker-compose.yml) :
 | Utilisateur / mot de passe DB | `root` / `prestashop` |
 | Email admin | `admin@example.com` |
 | Mot de passe admin | `PrestaAdmin123!` |
-| Thème | `AngarTheme`, monté en volume depuis `./theme-local` |
+| Thème | personnalisé, monté en volume depuis `./theme-local` |
 | Devise | XOF (Franc CFA), voir `Configuration::PS_CURRENCY_DEFAULT` |
 | Langue | Français (`fr`) |
 
@@ -194,8 +195,8 @@ UPDATE ps_shop_url SET domain = 'taysirshop.shop', domain_ssl = 'taysirshop.shop
 UPDATE ps_configuration SET value = '0' WHERE name IN ('PS_DEV_MODE', 'PS_DISPLAY_ERRORS');
 ```
 
-Les dossiers `theme-local/` (thème AngarTheme personnalisé) et `images/`
-(logos, bannières, visuels produits) sont versionnés avec le projet —
+Les dossiers `theme-local/` (thème personnalisé) et `images/` (logos,
+bannières, visuels produits) sont versionnés avec le projet —
 rien de spécial à migrer séparément s'ils partent avec le `git clone`/`scp`
 de l'étape 4.3 : les deux sont montés en volume dans `docker-compose.prod.yml`
 exactement comme en local.
