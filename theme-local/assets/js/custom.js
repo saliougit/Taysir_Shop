@@ -87,7 +87,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	// Respecte prefers-reduced-motion : dans ce cas tout reste visible.
 	// ============================================================
 	function markModuleReveals() {
-		if (!document.body.classList.contains('page-home')) {
+		// "page-home" est une classe posee sur #content (index.tpl), pas sur
+		// <body> (qui porte "page-index") : verifier document.body ici a
+		// toujours silencieusement echoue.
+		var contentEl = document.getElementById('content');
+		if (!contentEl || !contentEl.classList.contains('page-home')) {
 			return;
 		}
 		// Blocs produits "par sous-catégorie" (module angarcatproduct) : on arme
@@ -215,4 +219,51 @@ document.addEventListener('DOMContentLoaded', function () {
 		}, true);
 	}
 	setupFlyToCart();
+
+	// ============================================================
+	// Trainee doree au curseur, page d'accueil uniquement : de petites
+	// particules apparaissent au fil du mouvement de la souris et
+	// s'evaporent derriere elle. Desactivee sur tactile (pas de "survol"
+	// qui a du sens) et si l'utilisateur reduit les animations.
+	// ============================================================
+	function setupCursorTrail() {
+		// "page-home" est une classe posee sur #content (index.tpl), pas sur
+		// <body> (qui porte "page-index") : verifier document.body ici a
+		// toujours silencieusement echoue.
+		var contentEl = document.getElementById('content');
+		if (!contentEl || !contentEl.classList.contains('page-home')) {
+			return;
+		}
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			return;
+		}
+		if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+			return;
+		}
+
+		var lastSpawn = 0;
+		var minInterval = 45; // ms entre deux particules : trainee fluide sans saturer le DOM
+
+		document.addEventListener('mousemove', function (e) {
+			var now = performance.now();
+			if (now - lastSpawn < minInterval) {
+				return;
+			}
+			lastSpawn = now;
+
+			var spark = document.createElement('span');
+			spark.className = 'angar-cursor-spark';
+			spark.style.left = e.clientX + 'px';
+			spark.style.top = e.clientY + 'px';
+			// leger decalage aleatoire pour un nuage plus organique qu'une ligne parfaite
+			spark.style.marginLeft = (Math.random() * 8 - 4) + 'px';
+			spark.style.marginTop = (Math.random() * 8 - 4) + 'px';
+			document.body.appendChild(spark);
+
+			window.setTimeout(function () {
+				spark.remove();
+			}, 850);
+		}, { passive: true });
+	}
+	setupCursorTrail();
 });

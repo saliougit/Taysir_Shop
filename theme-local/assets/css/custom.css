@@ -157,6 +157,22 @@ nav.header-nav #contact-link span.shop-phone i {
    ================================ */
 #header {
   position: static;
+  /* Entree remarquee au tout premier chargement de la page (une seule
+     fois : "animation", pas "transition", donc rien ne se rejoue au
+     scroll ou au changement de page suivant). -100% donnait un effet de
+     "chute" un peu sec ; un glissement plus court et plus long en duree
+     est plus fluide. */
+  animation: angarHeaderEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes angarHeaderEntrance {
+  from { transform: translateY(-24px); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #header {
+    animation: none;
+  }
 }
 
 /* Le theme a deux fonctionnalites natives ("sticky menu" et "sticky cart",
@@ -464,6 +480,21 @@ div#search_widget form button[type=submit] {
   height: 100%;
   object-fit: contain;
   object-position: center;
+}
+/* Petit zoom d'entree a chaque fois qu'une slide devient active (premier
+   chargement inclus) : la classe is-active est reposee par le JS a chaque
+   changement, donc l'effet se rejoue en continu, pas juste une fois. */
+.angar-carousel-slide.is-active img {
+  animation: angarCarouselImgIntro 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes angarCarouselImgIntro {
+  from { transform: scale(1.09); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .angar-carousel-slide.is-active img {
+    animation: none;
+  }
 }
 .angar-carousel-arrow {
   position: absolute;
@@ -1570,5 +1601,30 @@ body, #wrapper, #content-wrapper, .page-home, #index {
     transform: none !important;
     transition: none !important;
   }
+}
+
+/* ================================
+   Trainee doree au curseur (page d'accueil uniquement)
+   De petites particules dorees apparaissent au fil du mouvement de la
+   souris et s'evaporent derriere elle. Purement decoratif : creees/
+   detruites en JS (voir custom.js), juste le style + l'animation ici.
+   ================================ */
+.angar-cursor-spark {
+  position: fixed;
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--angar-secondary) 45%, rgba(201, 162, 75, 0) 75%);
+  box-shadow: 0 0 6px 1px rgba(201, 162, 75, 0.55);
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: angarCursorSpark 0.8s ease-out forwards;
+}
+@keyframes angarCursorSpark {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) translateY(-18px) scale(0.2); opacity: 0; }
 }
 
